@@ -1,0 +1,25 @@
+name: Daily GitHub Report
+
+on:
+  schedule:
+    - cron: '0 9 * * *' # Runs at 09:00 UTC every day
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run script
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: python main.py
