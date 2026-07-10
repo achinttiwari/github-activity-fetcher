@@ -5,6 +5,9 @@ on:
     - cron: '0 9 * * *' # Runs at 09:00 UTC every day
   workflow_dispatch: # Enables the manual "Run workflow" button
 
+permissions:
+  contents: write # Grants the workflow permission to commit and push changes
+
 jobs:
   run-script:
     runs-on: ubuntu-latest
@@ -24,3 +27,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: python main.py
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          git commit -m "Update profile report"
+          git push
