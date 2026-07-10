@@ -3,6 +3,7 @@ name: Daily GitHub Report
 on:
   schedule:
     - cron: '0 9 * * *' # Runs at 09:00 UTC every day
+  workflow_dispatch: # Enables the manual "Run workflow" button
 
 jobs:
   run-script:
