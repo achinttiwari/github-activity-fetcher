@@ -6,7 +6,7 @@ on:
   workflow_dispatch: # Enables the manual "Run workflow" button
 
 permissions:
-  contents: write # Grants the workflow permission to commit and push changes
+  contents: write # Required to push commits back to the repository
 
 jobs:
   run-script:
@@ -14,11 +14,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Ensures full history is fetched for correct rebasing
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: 'pip' # Speeds up subsequent runs
 
       - name: Install dependencies
         run: pip install requests
@@ -32,6 +35,17 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add .
-          git commit -m "Update profile report"
-          git push
+          
+          # Check if there are changes to commit
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git add .
+            git commit -m "Update profile report"
+            
+            # Pull remote changes (rebase) to avoid "rejected" error
+            git pull --rebase origin main
+            
+            # Push changes
+            git push origin main
+          else
+            echo "No changes to commit, skipping."
+          fi
